@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+
+
+<html lang="en-us" data-theme="">
+<head>
+    
+        
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer-when-downgrade">
+
+<title>EPS32とPrometheusで作業環境のデータ収集している話 - チラ裏</title>
+<meta name="description" content="Anubis is a simple minimalist theme for Hugo blog engine.">
+
+<link rel="icon" type="image/x-icon" href="https://nasshu2916.github.io/favicon.ico">
+<link rel="apple-touch-icon-precomposed" href="https://nasshu2916.github.io/favicon.png">
+
+
+
+    
+
+
+
+
+
+    
+    
+    
+
+    
+        <link rel="stylesheet" href="https://nasshu2916.github.io/css/style.6155b6d8eded05b985178f56a637943b3e7fcfccc913d9c656bbebce7c91cc6b.css" integrity="sha256-YVW22O3tBbmFF49WpjeUOz5/z8zJE9nGVrvrznyRzGs=">
+    
+
+
+
+
+
+
+
+<meta property="og:title" content="EPS32とPrometheusで作業環境のデータ収集している話" />
+<meta property="og:description" content="EPS32とPrometheusで作業環境のデータ収集している話" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://nasshu2916.github.io/post/esp32_environment_logger/" />
+<meta property="article:published_time" content="2020-12-05T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-12-05T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="EPS32とPrometheusで作業環境のデータ収集している話"/>
+<meta name="twitter:description" content="EPS32とPrometheusで作業環境のデータ収集している話"/>
+
+
+
+
+
+
+
+
+
+    
+</head>
+<body>
+    <a class="skip-main" href="#main">Skip to main content</a>
+    <div class="container">
+        <header class="common-header"> 
+            
+                <h1 class="site-title">
+    <a href="/">チラ裏</a>
+</h1>
+
+    <nav>
+        
+        
+        <a class="" href="https://nasshu2916.github.io/post/" title="">Posts</a>
+        
+    </nav>
+
+
+            
+        </header>
+        <main id="main" tabindex="-1"> 
+            
+    
+    
+    <article class="post">
+        <header class="post-header">
+            <h1 class="post-title">EPS32とPrometheusで作業環境のデータ収集している話</h1>
+        </header>
+        <div class="content">
+            <p>この記事は <a href="https://adventar.org/calendars/5174">Akatsuki Advent Calendar 2020</a> 5日目の記事です.</p>
+<h2 id="はじめに">はじめに</h2>
+<p>アカツキでサーバエンジニアをしている <a href="https://github.com/nasshu2916">Naoya kohda</a> です。現在、在宅勤務をしているのですが、厚生労働省が<a href="https://www.mhlw.go.jp/stf/newpage_01603.html">在宅勤務の作業環境のガイドライン</a>として次のようにしています。</p>
+<blockquote>
+<p>テレワークを行う作業場が、自宅等の事業者が業務のために提供している作業場以外である場合には、事務所衛生基準規則（昭和47年労働省令第43号）、労働安全衛生規則及び「情報機器作業における労働衛生のためのガイドライン」（令和元年7月12日基発0712第3号）の衛生基準と同等の作業環境となるよう、テレワークを行う労働者に助言等を行うことが望ましい。</p>
+</blockquote>
+<p>要するに「在宅勤務するならオフィスと同じ様な環境になるように努力しろ」ということです。そのため在宅勤務手当を貰っているのにエアコンを付けずに電気代を浮かして懐に入れるとかもってのほかです。なので、作業環境が妥当か聞かれた時にすぐにエビデンスを出せるように、作業環境のデータを収集するセンサを作りました。</p>
+<h2 id="センサからデータの収集">センサからデータの収集</h2>
+<h3 id="使ったもの">使ったもの</h3>
+<ul>
+<li>マイコン(ESP32 DevKitC) : どこで買ったか忘れた (たぶん <a href="https://akizukidenshi.com/catalog/g/gM-11819/">秋月電子</a>)</li>
+<li>CO2センサ(MH-Z19B) : <a href="https://www.aliexpress.com/wholesale?SearchText=MH-Z19B">aliexpress</a> で買った</li>
+<li>気温 湿度センサ(BME680) : <a href="https://akizukidenshi.com/catalog/g/gK-14469/">秋月電子</a>で買った</li>
+</ul>
+<p>CO2センサはシリアル通信、気温 温度センサはI2Cで値を取りました。使ったライブラリは以下です。</p>
+<ul>
+<li><a href="https://github.com/WifWaf/MH-Z19">https://github.com/WifWaf/MH-Z19</a></li>
+<li><a href="https://github.com/SV-Zanshin/BME680">https://github.com/SV-Zanshin/BME680</a></li>
+</ul>
+<p>作ったものは下の画像のものです。
+<img src="https://user-images.githubusercontent.com/13119954/101245152-2b65ca00-374e-11eb-98ac-fd74d811e70d.jpg" alt="IMG_0182"></p>
+<h2 id="監視">監視</h2>
+<p><img src="https://user-images.githubusercontent.com/13119954/101245348-8fd55900-374f-11eb-84b3-bece9b410aec.png" alt="image"></p>
+<h2 id="まとめ">まとめ</h2>
+<h2 id="余談">余談</h2>
+<p>エアコン</p>
+
+        </div>
+        
+
+    
+
+
+<div class="post-info">
+    
+        <div class="post-date">2020-12-05</div>
+    
+    <div class="post-taxonomies">
+        
+            
+    </div>
+</div>
+
+    </article>
+
+    
+        
+    
+
+    
+
+
+        </main>
+        
+            <footer class="common-footer">
+    
+    
+
+    <div class="common-footer-bottom">
+        
+        <div class="copyright">
+            <p>© Naoya Kohda, 2020<br>
+            Powered by <a target="_blank" rel="noopener noreferrer" href="https://gohugo.io/">Hugo</a>, theme <a target="_blank" rel="noopener noreferrer" href="https://github.com/mitrichius/hugo-theme-anubis">Anubis</a>.
+            </p>  
+        </div> 
+
+        
+
+    
+
+
+   
+    </div>
+</footer>
+
+        
+    </div>
+</body>
+</html>
