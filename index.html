@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 
-<html lang="en-us" data-theme="">
+<html lang="ja" data-theme="">
 <head>
 	<meta name="generator" content="Hugo 0.79.0" />
     
@@ -28,10 +28,12 @@
 
     
     
+        
+    
     
 
     
-        <link rel="stylesheet" href="https://blog.naoyakohda.net/css/style.6155b6d8eded05b985178f56a637943b3e7fcfccc913d9c656bbebce7c91cc6b.css" integrity="sha256-YVW22O3tBbmFF49WpjeUOz5/z8zJE9nGVrvrznyRzGs=">
+        <link rel="stylesheet" href="https://blog.naoyakohda.net/css/style.min.4833d18af9ac02c09674dcc658c73189b637bb66a103ec29492cc8decdf35dc8.css" integrity="sha256-SDPRivmsAsCWdNzGWMcxibY3u2ahA&#43;wpSSzI3s3zXcg=">
     
 
 
@@ -40,19 +42,32 @@
 
 
 
-<meta property="og:title" content="チラ裏" />
+<meta property="og:title" content="" />
 <meta property="og:description" content="Anubis is a simple minimalist theme for Hugo blog engine." />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://blog.naoyakohda.net/" />
 <meta property="og:updated_time" content="2020-12-05T00:00:00+00:00" />
 
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="チラ裏"/>
+<meta name="twitter:title" content=""/>
 <meta name="twitter:description" content="Anubis is a simple minimalist theme for Hugo blog engine."/>
 
 
 
 
+
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'G-N29DVBV25V', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
 
 
 
@@ -93,16 +108,7 @@
     </header>
 
     <div class="content post-summary">
-        この記事は Akatsuki Advent Calendar 2020 5日目の記事です.
-はじめに アカツキでサーバエンジニアをしている Naoya kohda です。現在、在宅勤務をしているのですが、厚生労働省が在宅勤務の作業環境のガイドラインとして次のようにしています。
- テレワークを行う作業場が、自宅等の事業者が業務のために提供している作業場以外である場合には、事務所衛生基準規則（昭和47年労働省令第43号）、労働安全衛生規則及び「情報機器作業における労働衛生のためのガイドライン」（令和元年7月12日基発0712第3号）の衛生基準と同等の作業環境となるよう、テレワークを行う労働者に助言等を行うことが望ましい。
- 要するに「在宅勤務するならオフィスと同じ様な環境になるように努力しろ」ということです。そのため在宅勤務手当を貰っているのにエアコンを付けずに電気代を浮かして懐に入れるとかもってのほかです。なので、作業環境が妥当か聞かれた時にすぐにエビデンスを出せるように、作業環境のデータを収集するセンサを作りました。
-センサからデータの収集 使ったもの  マイコン(ESP32 DevKitC) : どこで買ったか忘れた (たぶん 秋月電子) CO2センサ(MH-Z19B) : aliexpress で買った 気温 湿度センサ(BME680) : 秋月電子で買った  CO2センサはシリアル通信、気温 温度センサはI2Cで値を取りました。使ったライブラリは以下です。
- https://github.com/WifWaf/MH-Z19 https://github.com/SV-Zanshin/BME680  作ったものは下の画像のものです。 監視 ESP32で取得した値を何かしらで収集したいのですが、その条件として以下がありました。
- CO2の濃度が高くなればどこかに通知したい 管理ツールを一つにまとめたい 面倒くさいので楽な実装が良い  1.は Slack のMessage API を使えば簡単に解決できます。問題は2.と3.で ”一定の閾値を超えたらリクエストを投げる”みたいな実装にすると、閾値を変えるエンドポイントを作り、その閾値を EEPROM(ESP32の場合、疑似EEPROM)に保存しないといけません。また、自宅で Proxmoxでサーバ運用しているのですが、これの通知周りとは別になるので管理がめんどくさくなるという問題があります。
-自宅サーバの管理ツールとして、prometheusとgrafanaを使っているので、ESP32もprometheusで監視できるようにexporterを作りました。prometheusで収集した情報をgrafanaを使って可視化とアラートを送るのでESP32側で通知の実装をしなくて済むので楽です。
-grafanaで可視化した画面は下の様な感じです。 これで作業環境が状態がすぐに分かるようになりました。
-まとめ  CO2と温度、湿度センサの値をESP32で値を読み取る EPS32のデータをPrometheusで収集する grafana側で通知の設定ができるので実装が楽  
+        
     </div>
     
     
