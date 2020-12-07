@@ -23,30 +23,30 @@
 &lt;blockquote&gt;
 &lt;p&gt;テレワークを行う作業場が、自宅等の事業者が業務のために提供している作業場以外である場合には、事務所衛生基準規則（昭和47年労働省令第43号）、労働安全衛生規則及び「情報機器作業における労働衛生のためのガイドライン」（令和元年7月12日基発0712第3号）の衛生基準と同等の作業環境となるよう、テレワークを行う労働者に助言等を行うことが望ましい。&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;要するに「在宅勤務するならオフィスと同じ様な環境になるように努力しろ」ということです。そのため在宅勤務手当を貰っているのにエアコンを付けずに電気代を浮かして懐に入れるとかもってのほかです。なので、作業環境が妥当か聞かれた時にすぐにエビデンスを出せるように、作業環境のデータを収集するセンサを作りました。&lt;/p&gt;
+&lt;p&gt;要するに「在宅勤務するならオフィスと同じ様な環境になるように努力しろ」ということです。なので、作業環境が妥当か聞かれた時にすぐにエビデンスを出せるように、作業環境のデータを収集するセンサを作りました。&lt;/p&gt;
 &lt;h2 id=&#34;センサからデータの収集&#34;&gt;センサからデータの収集&lt;/h2&gt;
-&lt;h3 id=&#34;使ったもの&#34;&gt;使ったもの&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;マイコン(ESP32 DevKitC) : どこで買ったか忘れた (たぶん &lt;a href=&#34;https://akizukidenshi.com/catalog/g/gM-11819/&#34;&gt;秋月電子&lt;/a&gt;)&lt;/li&gt;
-&lt;li&gt;CO2センサ(MH-Z19B) : &lt;a href=&#34;https://www.aliexpress.com/wholesale?SearchText=MH-Z19B&#34;&gt;aliexpress&lt;/a&gt; で買った&lt;/li&gt;
-&lt;li&gt;気温 湿度センサ(BME680) : &lt;a href=&#34;https://akizukidenshi.com/catalog/g/gK-14469/&#34;&gt;秋月電子&lt;/a&gt;で買った&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;CO2センサはシリアル通信、気温 温度センサはI2Cで値を取りました。使ったライブラリは以下です。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/WifWaf/MH-Z19&#34;&gt;https://github.com/WifWaf/MH-Z19&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/SV-Zanshin/BME680&#34;&gt;https://github.com/SV-Zanshin/BME680&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;作ったものは下の画像のものです。
-&lt;img src=&#34;https://user-images.githubusercontent.com/13119954/101245152-2b65ca00-374e-11eb-98ac-fd74d811e70d.jpg&#34; alt=&#34;IMG_0182&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;仕様パーツ&#34;&gt;仕様パーツ&lt;/h3&gt;
+&lt;p&gt;マイコンにESP32 DevKitCを使いました。&lt;/p&gt;
+&lt;img src=&#34;https://akizukidenshi.com/img/goods/L/M-11819.jpg&#34; alt=&#34;esp32&#34; width=&#34;120&#34;&gt;
+&lt;p&gt;Arduinoでも良かったのですが、デフォルトでWiFiが使えるのと安いから選びました。&lt;a href=&#34;https://github.com/espressif/arduino-esp32&#34;&gt;Arduino Core for the ESP32&lt;/a&gt;を使えばArduinoと同じ様に書き込みができます。ただloop()で処理を行うのでせっかくのデュアルコアを無駄にしている感があるのですが。&lt;/p&gt;
+&lt;p&gt;CO2センサは &lt;a href=&#34;https://www.aliexpress.com/wholesale?SearchText=MH-Z19B&#34;&gt;aliexpress&lt;/a&gt; で買ったMH-Z19Bを使いました。国内でだとamazonとかで購入できます。MH-Z19BはCO2センサの中では安く2000円台で入手できます。&lt;/p&gt;
+&lt;p&gt;温湿度センサは&lt;a href=&#34;https://akizukidenshi.com/catalog/g/gK-14469/&#34;&gt;秋月電子&lt;/a&gt;で買ったBME680を使いました。
+&lt;img src=&#34;https://akizukidenshi.com/img/goods/C/K-14469.jpg&#34; alt=&#34;esp32&#34; width=&#34;120&#34;&gt;&lt;/p&gt;
+&lt;p&gt;圧力、湿度、温度とガスの情報を計測できるセンサです。&lt;/p&gt;
+&lt;p&gt;MH-Z19Bはハードウェアシリアル経由、BME680はI2C経由で接続しました。&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/nasshu2916/ESP32_exporter&#34;&gt;ソースコード&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;作ったものは下の画像のものです。(基板作るのが面倒くさくてブレッドボード上で動かしてます。)
+&lt;img src=&#34;./IMG_0182.jpg&#34; alt=&#34;esp32&#34; width=&#34;480&#34;&gt;&lt;/p&gt;
 &lt;h2 id=&#34;監視&#34;&gt;監視&lt;/h2&gt;
 &lt;p&gt;ESP32で取得した値を何かしらで収集したいのですが、その条件として以下がありました。&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;CO2の濃度が高くなればどこかに通知したい&lt;/li&gt;
-&lt;li&gt;管理ツールを一つにまとめたい&lt;/li&gt;
+&lt;li&gt;過去の情報も見たい&lt;/li&gt;
 &lt;li&gt;面倒くさいので楽な実装が良い&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;1.は Slack のMessage API を使えば簡単に解決できます。問題は2.と3.で ”一定の閾値を超えたらリクエストを投げる”みたいな実装にすると、閾値を変えるエンドポイントを作り、その閾値を EEPROM(ESP32の場合、疑似EEPROM)に保存しないといけません。また、自宅で Proxmoxでサーバ運用しているのですが、これの通知周りとは別になるので管理がめんどくさくなるという問題があります。&lt;/p&gt;
-&lt;p&gt;自宅サーバの管理ツールとして、prometheusとgrafanaを使っているので、ESP32もprometheusで監視できるようにexporterを作りました。prometheusで収集した情報をgrafanaを使って可視化とアラートを送るのでESP32側で通知の実装をしなくて済むので楽です。&lt;/p&gt;
+&lt;p&gt;1.は Slack のMessage API を使えば簡単に解決できます。ただ、”一定の閾値を超えたらリクエストを投げる”みたいな実装にすると、閾値を変えられるエンドポイントを作り、その値を EEPROM(ESP32の場合、疑似EEPROM)に保存するような実装をしないといけません。&lt;/p&gt;
+&lt;p&gt;自宅で Proxmox でサーバ運用しているのですが、自宅サーバの監視ツールと別になると管理が面倒くさくなるという理由で、自宅サーバの管理ツールとして使っている prometheus と grafana を使うことにしました。そのため、Prometheusがメトリクス収集できるようにESP32にexporterを作りました。&lt;/p&gt;
+&lt;p&gt;prometheusで収集した情報をgrafanaを使って可視化とアラートを送るのでESP32側で通知の実装をしなくて済むので楽です。&lt;/p&gt;
 &lt;p&gt;grafanaで可視化した画面は下の様な感じです。
 &lt;img src=&#34;https://user-images.githubusercontent.com/13119954/101245348-8fd55900-374f-11eb-84b3-bece9b410aec.png&#34; alt=&#34;image&#34;&gt;&lt;/p&gt;
 &lt;p&gt;これで作業環境が状態がすぐに分かるようになりました。&lt;/p&gt;
