@@ -122,6 +122,8 @@ if (!doNotTrack) {
 <p>作ったものは下の画像のものです。(基板作るのが面倒くさくてブレッドボード上で動かしてます。)
 <img src="./senser.jpg" alt="esp32" width="480"></p>
 <h2 id="監視">監視</h2>
+<p>監視システムのざっくりとした構成図は下のようになりました。
+<img src="./overview.png" alt="exporter" width="480"></p>
 <p>ESP32で取得した値を<a href="https://www.switch-science.com/catalog/3647/">M5 stack</a> に付いているようなLCDディスプレイに表示させても良いのですが、</p>
 <ol>
 <li>過去の情報も見たい</li>
@@ -147,8 +149,6 @@ if (!doNotTrack) {
 <p>そのため、 可視化には Prometheus ではなく Grafana で可視化を行います。Grafana で可視化した画面は下の様な感じです。
 <img src="https://user-images.githubusercontent.com/13119954/101245348-8fd55900-374f-11eb-84b3-bece9b410aec.png" alt="exporter" width="480"></p>
 <p>これで作業環境が状態がすぐに分かるようになりました。また、Grafana 側で簡単に Slack などへの通知の設定を行えます。</p>
-<p>そのため、全体的な構成図としては下のようになります。
-<img src="./overview.png" alt="exporter" width="480"></p>
 <h2 id="まとめ">まとめ</h2>
 <ul>
 <li>CO2と温度、湿度センサの値を ESP32 で値を読み取る</li>
@@ -156,7 +156,7 @@ if (!doNotTrack) {
 <li>Prometheus のメトリクスデータを Grafana で可視化</li>
 </ul>
 <h2 id="余談">余談</h2>
-<p>エアコンを付けていた時の室温のグラフなんですが、エアコンの温度制御がよく分かる。
+<p>エアコンを付けていた時の室温のグラフなんですが、こうして見るとエアコンの温度制御がよく分かる。
 <img src="./temperature.png" alt="exporter" width="480"></p>
 <h2 id="追記">追記</h2>
 <p>温湿度センサ(BME680)のスペックシート眺めてたらこんなことが書いてあった。</p>
