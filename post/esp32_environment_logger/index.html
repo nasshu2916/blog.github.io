@@ -119,28 +119,56 @@ if (!doNotTrack) {
 <img src="https://akizukidenshi.com/img/goods/C/K-14469.jpg" alt="esp32" width="120"></p>
 <p>圧力、湿度、温度とガスの情報を計測できるセンサです。</p>
 <p>MH-Z19Bはハードウェアシリアル経由、BME680はI2C経由で接続しました。</p>
-<p><a href="https://github.com/nasshu2916/ESP32_exporter">ソースコード</a></p>
 <p>作ったものは下の画像のものです。(基板作るのが面倒くさくてブレッドボード上で動かしてます。)
-<img src="./IMG_0182.jpg" alt="esp32" width="480"></p>
+<img src="./senser.jpg" alt="esp32" width="480"></p>
 <h2 id="監視">監視</h2>
-<p>ESP32で取得した値を何かしらで収集したいのですが、その条件として以下がありました。</p>
+<p>ESP32で取得した値を<a href="https://www.switch-science.com/catalog/3647/">M5 stack</a> に付いているようなLCDディスプレイに表示させても良いのですが、</p>
 <ol>
-<li>CO2の濃度が高くなればどこかに通知したい</li>
 <li>過去の情報も見たい</li>
-<li>面倒くさいので楽な実装が良い</li>
+<li>CO2の濃度が高くなればどこかに通知したい</li>
+<li>面倒くさいのでできれば楽な実装が良い</li>
 </ol>
-<p>1.は Slack のMessage API を使えば簡単に解決できます。ただ、”一定の閾値を超えたらリクエストを投げる”みたいな実装にすると、閾値を変えられるエンドポイントを作り、その値を EEPROM(ESP32の場合、疑似EEPROM)に保存するような実装をしないといけません。</p>
-<p>自宅で Proxmox でサーバ運用しているのですが、自宅サーバの監視ツールと別になると管理が面倒くさくなるという理由で、自宅サーバの管理ツールとして使っている prometheus と grafana を使うことにしました。そのため、Prometheusがメトリクス収集できるようにESP32にexporterを作りました。</p>
-<p>prometheusで収集した情報をgrafanaを使って可視化とアラートを送るのでESP32側で通知の実装をしなくて済むので楽です。</p>
-<p>grafanaで可視化した画面は下の様な感じです。
-<img src="https://user-images.githubusercontent.com/13119954/101245348-8fd55900-374f-11eb-84b3-bece9b410aec.png" alt="image"></p>
-<p>これで作業環境が状態がすぐに分かるようになりました。</p>
+<p>このような条件がありました。そのため、ディスプレイに表示するのではなく、何かしらのツールで監視する必要があります。</p>
+<p>SaaS 系のメトリクス監視ツールがあるのですが、無料版だと制限があり、<del>こんなお遊びに</del>お金を払う価値があるのかという問題が出てきます。そのため、できればOSSなどで無料で使えるものが良いという条件が加わりました。</p>
+<p>OSS の監視ツールとして有名なもののして <a href="https://www.zabbix.com/">Zabbix</a> や <a href="https://www.nagios.org/">Nagios</a>、<a href="http://munin-monitoring.org/">Munin</a> などがありますが、今回は <a href="https://prometheus.io/">Prometheus</a> を選びました。理由として、TSDB(時系列データベース)が Prometheus に内蔵されているため、1つのバイナリで動作します(Remote Storage にも対応していますが)。ため、他の監視ツールに比べ環境構築が非常に楽です。今回は Manjaro Linux 上で Prometheus を動かしたのですが、以下のコマンド1つでインストールが完了します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">yay -Syu prometheus
+</code></pre></div><p>また、公式ページの<a href="https://prometheus.io/docs/introduction/overview/#architecture">アーキテクチャ図</a>にある通り Pull 型の収集です。メトリクス公開側はリクエストに対して応答するシステムになるため、収集側の情報を保つ必要がなくなります(これでAPIキーをハードコーディングしなくて済む)。そのため、Prometheus に収集してもらうために exporter を作りました。<a href="https://github.com/nasshu2916/ESP32_exporter">[ソースコード]</a>ESP32に対して GET リクエストを送った結果は下の画像の様になります。</p>
+<img src="./exporter.png" alt="exporter" width="480">
+<p>また、Prometheus の設定としては<code>/etc/prometheus/prometheus.yml</code>に次の様に収集対象の情報を足します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">scrape_configs</span>:
+  - <span style="color:#f92672">job_name</span>: <span style="color:#e6db74">&#39;prometheus&#39;</span>
+    <span style="color:#f92672">static_configs</span>:
+      - <span style="color:#f92672">targets</span>: [<span style="color:#e6db74">&#39;localhost:9090&#39;</span>]
+  - <span style="color:#f92672">job_name</span>: <span style="color:#e6db74">&#39;EnvironmentalSensor&#39;</span>
+    <span style="color:#f92672">static_configs</span>:
+      - <span style="color:#f92672">targets</span>: [<span style="color:#e6db74">&#39;IPAddress:Port&#39;</span>]
+</code></pre></div><p>ただ、Prometheus の欠点として収集したメトリクスの可視化に向いていない点です。実際、Prometheus で表示すると下の画像の様になります。</p>
+<img src="./prometheus.png" alt="exporter" width="480">
+<p>そのため、 可視化には Prometheus ではなく Grafana で可視化を行います。Grafana で可視化した画面は下の様な感じです。
+<img src="https://user-images.githubusercontent.com/13119954/101245348-8fd55900-374f-11eb-84b3-bece9b410aec.png" alt="exporter" width="480"></p>
+<p>これで作業環境が状態がすぐに分かるようになりました。また、Grafana 側で簡単に Slack などへの通知の設定を行えます。</p>
+<p>そのため、全体的な構成図としては下のようになります。
+<img src="./overview.png" alt="exporter" width="480"></p>
 <h2 id="まとめ">まとめ</h2>
 <ul>
-<li>CO2と温度、湿度センサの値をESP32で値を読み取る</li>
-<li>EPS32のデータをPrometheusで収集する</li>
-<li>grafana側で通知の設定ができるので実装が楽</li>
+<li>CO2と温度、湿度センサの値を ESP32 で値を読み取る</li>
+<li>Prometheus で収集する用の exporter を ESP32 側に実装する</li>
+<li>Prometheus のメトリクスデータを Grafana で可視化</li>
 </ul>
+<h2 id="余談">余談</h2>
+<p>エアコンを付けていた時の室温のグラフなんですが、エアコンの温度制御がよく分かる。
+<img src="./temperature.png" alt="exporter" width="480"></p>
+<h2 id="追記">追記</h2>
+<p>温湿度センサ(BME680)のスペックシート眺めてたらこんなことが書いてあった。</p>
+<table>
+<thead>
+<tr>
+<th>CO2 equivalents (ppm)</th>
+<th>Estimation of the CO2 level in ppm. The sensor does not directly measure CO2, but derives this from the average correlation between VOCs and CO2 in human’s exhaled breath.</th>
+</tr>
+</thead>
+</table>
+<p>BOSCHの<a href="https://github.com/BoschSensortec/BME680_driver">公式ライブラリ</a>を使えば推定のCO2濃度が取れるらしい。CO2センサいらないじゃん。(最初にスペックシート読んでないことがバレてしまった。そもそも公式のライブラリがあるとは知らなかった。)</p>
         </div>
         
 
